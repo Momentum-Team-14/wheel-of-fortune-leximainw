@@ -79,7 +79,7 @@ def play_game():
                         errors += 1
                         if errors >= MAX_ERRORS:
                             print(colorama.Fore.RED + "Game over!" + colorama.Style.RESET_ALL)
-                            print(f"The word was: {curr_phrases[0]}")
+                            print(f"The word was: {random.choice(curr_phrases)}")
                             break
                 else:
                     print(f"You've already guessed {guess}!")
