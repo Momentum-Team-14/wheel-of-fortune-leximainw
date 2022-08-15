@@ -72,7 +72,14 @@ def play_game():
             if len(guess) == 1:
                 if guess not in guessed_letters:
                     if mode == "evil":
-                        curr_phrases = evil_matches(curr_phrases, guessed_letters, guess)[0]
+                        evil_set = False
+                        if MAX_ERRORS - errors <= 2:
+                            miss_phrases = evil_matches(curr_phrases, guessed_letters, guess, killer_mode=True)[0]
+                            if len(miss_phrases):
+                                curr_phrases = miss_phrases
+                                evil_set = True
+                        if not evil_set:
+                            curr_phrases = evil_matches(curr_phrases, guessed_letters, guess)[0]
                     correct = check_guess(curr_phrases[0], guess)
                     guessed_letters.append(guess)
                     if not correct:
@@ -142,9 +149,15 @@ def display_board(phrase, guessed, guessed_phrases):
     return not complete
 
 
-def evil_matches(curr_phrases, guessed, guess=None, depth=2):
+def evil_matches(curr_phrases, guessed, guess=None, depth=2, killer_mode=False):
+    if killer_mode:
+        k_miss = 1
+        k_hit = 0
+    else:
+        k_miss = 1.07
+        k_hit = 1
     if depth <= 0:
-        return (curr_phrases, len(curr_phrases) * 1.07 if guess not in list(curr_phrases[0]) else 1)
+        return (curr_phrases, len(curr_phrases) * k_miss if guess not in list(curr_phrases[0]) else k_hit)
     if guess == None:
         test_guesses = [x for x in ALPHABET if x not in guessed]
         best = []
@@ -167,10 +180,9 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=2):
 
         best = []
         best_score = 0
-        for key, value in categories.items():
+        for _, value in categories.items():
             results, score = evil_matches(value, guesses, depth=depth - 1)
-            if guess not in list(results[0]):
-                score *= 1.07
+            score *= k_miss if guess not in list(results[0]) else k_hit
             if score > best_score:
                 best_score = score
                 best = results
