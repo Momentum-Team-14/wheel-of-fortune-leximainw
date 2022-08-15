@@ -154,7 +154,7 @@ def display_board(phrase, guessed, guessed_phrases):
 
 
 def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
-                 killer_mode=False, alpha=float("-inf"), beta=float("inf")):
+                 killer_mode=False, alpha=float("-inf"), beta=float("inf"), transpositions={}):
     if killer_mode:
         k_miss = 1
         k_hit = 0
@@ -163,6 +163,9 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
         k_hit = 1
     if depth <= 0:
         return (curr_phrases, len(curr_phrases) * k_miss if guess not in list(curr_phrases[0]) else k_hit)
+    key = (format_phrase(curr_phrases[0], guessed)[0], tuple(guessed), guess, depth)
+    if key in transpositions:
+        return transpositions[key]
     if guess == None:
         test_guesses = [x for x in ALPHABET if x not in guessed]
         best = []
@@ -176,6 +179,7 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
             if score <= alpha:   # alpha cutoff
                 break
             beta = min(beta, score)
+        transpositions[key] = (best, best_score)
         return (best, best_score)
     else:
         categories = {}
@@ -199,6 +203,7 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
             if score >= beta:   # beta cutoff
                 break
             alpha = max(alpha, score)
+        transpositions[key] = (best, best_score)
         return (best, best_score)
 
 
