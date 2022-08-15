@@ -54,7 +54,8 @@ def play_game():
                 won = True
                 print("You win!")
             else:
-                print(f"You have {MAX_ERRORS - errors} guesses left!")
+                remain = MAX_ERRORS - errors
+                print(f"You have {remain} guess{'' if remain == 1 else 'es'} left!")
         if not str_to_bool(input("Play again? ")):
             return
 
@@ -79,7 +80,7 @@ def evil_matches(curr_phrases, guessed, guess):
         if display not in categories:
             categories[display] = []
         categories[display].append(phrase)
-    return max(categories.items(), key=lambda x: len(x[1]) + (guess in list(x[1][0]) and 0 or 1))[1]
+    return max(categories.items(), key=lambda x: len(x[1]) + (0 if guess in list(x[1][0]) else 1))[1]
 
 
 def format_phrase(phrase, guessed):
