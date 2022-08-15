@@ -71,7 +71,7 @@ def play_game():
             if len(guess) == 1:
                 if guess not in guessed_letters:
                     if mode == "evil":
-                        curr_phrases = evil_matches(curr_phrases, guessed_letters, guess)
+                        curr_phrases, _ = evil_matches(curr_phrases, guessed_letters, guess)
                     correct = check_guess(curr_phrases[0], guess)
                     guessed_letters.append(guess)
                     if not correct:
@@ -120,17 +120,17 @@ def display_board(phrase, guessed):
 
 def evil_matches(curr_phrases, guessed, guess=None, depth=2):
     if depth <= 0:
-        return curr_phrases[0]
+        return (curr_phrases, len(curr_phrases) * 1.07 if guess not in list(curr_phrases[0]) else 1)
     if guess == None:
         test_guesses = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" if x not in guessed]
         best = []
-        best_len = 0
+        best_score = 0
         for guess in test_guesses:
-            results = evil_matches(curr_phrases, guessed, guess, depth=depth)
-            if len(results) > best_len:
-                best_len = len(results)
+            results, score = evil_matches(curr_phrases, guessed, guess, depth=depth)
+            if score > best_score:
+                best_score = score
                 best = results
-        return best
+        return (best, best_score)
     else:
         categories = {}
         guesses = guessed[:]
@@ -140,7 +140,17 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=2):
             if display not in categories:
                 categories[display] = []
             categories[display].append(phrase)
-        return max(categories.items(), key=lambda x: len(evil_matches(x[1], guesses, depth=depth - 1)))[1]
+
+        best = []
+        best_score = 0
+        for key, value in categories.items():
+            results, score = evil_matches(value, guesses, depth=depth - 1)
+            if guess not in list(results[0]):
+                score *= 1.07
+            if score > best_score:
+                best_score = score
+                best = results
+        return (best, best_score)
 
 
 def format_phrase(phrase, guessed):
