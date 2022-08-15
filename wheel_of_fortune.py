@@ -1,5 +1,4 @@
 from getpass import getpass
-from turtle import color
 import colorama
 import random
 import re
