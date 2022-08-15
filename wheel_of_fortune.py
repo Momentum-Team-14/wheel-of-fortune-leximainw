@@ -118,6 +118,7 @@ def play_game():
                         won = True
                     else:
                         guessed_phrases.append(guess)
+                        errors += 1
                 else:
                     print(f"You've already guessed {guess}!")
             if not display_board(curr_phrases[0], guessed_letters, guessed_phrases):
