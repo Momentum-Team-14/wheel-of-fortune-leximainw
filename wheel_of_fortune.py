@@ -1,3 +1,4 @@
+from getpass import getpass
 import random
 import re
 
@@ -17,6 +18,9 @@ def play_game():
                 mode = input("Difficulty: ").lower()
                 if mode == "any":
                     pass
+                elif mode == "custom":
+                    curr_phrases = [getpass("Phrase: ")]
+                    max_len = 0
                 elif mode == "easy":
                     min_len = 4
                     max_len = 6
@@ -28,6 +32,7 @@ def play_game():
                 elif mode == "evil":
                     print("Do you want to play an easy, normal, hard, or brutal evil round?")
                     while True:
+                        mode = input("Evilness: ").lower()
                         if mode == "any":
                             pass
                         elif mode == "easy":
@@ -47,11 +52,12 @@ def play_game():
                 else:
                     continue
                 break
-        curr_phrases = [x for x in all_phrases if min_len <= len(x) <= max_len]
-        curr_phrases = [random.choice(curr_phrases)]
-        if mode == "evil":
-            curr_len = len(curr_phrases[0])
-            curr_phrases = [x for x in all_phrases if len(x) == curr_len]
+        if max_len:
+            curr_phrases = [x for x in all_phrases if min_len <= len(x) <= max_len]
+            curr_phrases = [random.choice(curr_phrases)]
+            if mode == "evil":
+                curr_len = len(curr_phrases[0])
+                curr_phrases = [x for x in all_phrases if len(x) == curr_len]
         guessed_letters = []
         errors = 0
         won = False
@@ -82,11 +88,11 @@ def play_game():
 
 
 def check_guess(phrase, guess):
-    return guess in list(phrase)
+    return guess in list(phrase.lower())
 
 
 def display_board(phrase, guessed):
-    wrong_guesses = [letter for letter in guessed if letter not in list(phrase)]
+    wrong_guesses = [letter for letter in guessed if letter not in list(phrase.lower())]
     display, complete = format_phrase(phrase, guessed)
     print(f"{display}   Wrong: {''.join(wrong_guesses)}")
     return not complete
@@ -109,7 +115,7 @@ def format_phrase(phrase, guessed):
     display = []
     complete = True
     for char in list(phrase):
-        if char in guessed or re.match("[^A-Za-z]", char):
+        if char.lower() in guessed or re.match("[^A-Za-z]", char):
             display.append(char)
         else:
             complete = False
