@@ -63,9 +63,10 @@ def play_game():
                 curr_len = len(curr_phrases[0])
                 curr_phrases = [x for x in all_phrases if len(x) == curr_len]
         guessed_letters = []
+        guessed_phrases = []
         errors = 0
         won = False
-        display_board(curr_phrases[0], guessed_letters)
+        display_board(curr_phrases[0], guessed_letters, guessed_phrases)
         while errors < MAX_ERRORS and not won:
             guess = prompt_guess()
             if len(guess) == 1:
@@ -83,16 +84,23 @@ def play_game():
                 else:
                     print(f"You've already guessed {guess}!")
             else:
-                if mode == "evil" and len(curr_phrases) > 1:
-                    curr_phrases = [x for x in curr_phrases if x.lower() != guess]
-                if guess.startswith("/"):
-                    if guess == "/howmany":
-                        print(len(curr_phrases))
+                if guess not in guessed_phrases:
+                    if mode == "evil" and len(curr_phrases) > 1:
+                        curr_phrases = [x for x in curr_phrases if x.lower() != guess]
+                    if guess.startswith("/"):
+                        if guess == "/howmany":
+                            print(len(curr_phrases))
+                        else:
+                            print(f"unknown command {guess}")
+                    elif guess in [x.lower() for x in curr_phrases]:
+                        for x in list(guess):
+                            guessed_letters.append(x)
+                        won = True
                     else:
-                        print(f"unknown command {guess}")
-                elif guess in [x.lower() for x in curr_phrases]:
-                    won = True
-            if not display_board(curr_phrases[0], guessed_letters):
+                        guessed_phrases.append(guess)
+                else:
+                    print(f"You've already guessed {guess}!")
+            if not display_board(curr_phrases[0], guessed_letters, guessed_phrases):
                 won = True
             else:
                 remain = MAX_ERRORS - errors
@@ -107,13 +115,16 @@ def check_guess(phrase, guess):
     return guess in list(phrase.lower())
 
 
-def display_board(phrase, guessed):
+def display_board(phrase, guessed, guessed_phrases):
     wrong_guesses = [letter for letter in guessed if letter not in list(phrase.lower())]
     display, complete = format_phrase(phrase, guessed)
     print(f"{colorama.Style.BRIGHT + colorama.Fore.WHITE}{display}", end="")
     if len(wrong_guesses):
         print(f"   {colorama.Style.DIM + colorama.Fore.WHITE}Wrong: "
             + f"{colorama.Style.NORMAL + colorama.Fore.RED}{''.join(wrong_guesses)}", end="")
+    if len(guessed_phrases):
+        for guessed_phrase in guessed_phrases:
+            print(f"\n   {guessed_phrase}", end="")
     print(colorama.Style.RESET_ALL)
     return not complete
 
