@@ -119,7 +119,7 @@ def display_board(phrase, guessed, guessed_phrases):
     wrong_guesses = [letter for letter in guessed if letter not in list(phrase.lower())]
     display, complete = format_phrase(phrase, guessed)
     print(f"{colorama.Style.BRIGHT + colorama.Fore.WHITE}{display}", end="")
-    if len(wrong_guesses):
+    if len(wrong_guesses) or len(guessed_phrases):
         print(f"   {colorama.Style.DIM + colorama.Fore.WHITE}Wrong: "
             + f"{colorama.Style.NORMAL + colorama.Fore.RED}{''.join(wrong_guesses)}", end="")
     if len(guessed_phrases):
