@@ -102,6 +102,8 @@ def play_game():
                                 best = len(curr_phrases)
                                 best_char = "?"
                                 for char in ALPHABET.lower():
+                                    if char in guessed_letters:
+                                        continue
                                     subphrases = evil_matches(curr_phrases, guessed_letters, char)[0]
                                     if len(subphrases) < best:
                                         best = len(subphrases)
