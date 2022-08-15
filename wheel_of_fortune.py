@@ -1,4 +1,6 @@
 from getpass import getpass
+from turtle import color
+import colorama
 import random
 import re
 
@@ -8,6 +10,7 @@ MAX_ERRORS = 8
 
 
 def play_game():
+    colorama.init()
     all_phrases = import_phrases()
     while True:
         min_len = 0
@@ -72,14 +75,14 @@ def play_game():
                 if not correct:
                     errors += 1
                     if errors >= MAX_ERRORS:
-                        print("Game over!")
+                        print(colorama.Fore.RED + "Game over!" + colorama.Style.RESET_ALL)
                         print(f"The word was: {curr_phrases[0]}")
                         break
             else:
                 print(f"You've already guessed {guess}!")
             if not display_board(curr_phrases[0], guessed_letters):
                 won = True
-                print("You win!")
+                print(colorama.Fore.GREEN + "You win!" + colorama.Style.RESET_ALL)
             else:
                 remain = MAX_ERRORS - errors
                 print(f"You have {remain} guess{'' if remain == 1 else 'es'} left!")
@@ -94,7 +97,11 @@ def check_guess(phrase, guess):
 def display_board(phrase, guessed):
     wrong_guesses = [letter for letter in guessed if letter not in list(phrase.lower())]
     display, complete = format_phrase(phrase, guessed)
-    print(f"{display}   Wrong: {''.join(wrong_guesses)}")
+    print(f"{colorama.Style.BRIGHT + colorama.Fore.WHITE}{display}", end="")
+    if len(wrong_guesses):
+        print(f"   {colorama.Style.DIM + colorama.Fore.WHITE}Wrong: "
+            + f"{colorama.Style.NORMAL + colorama.Fore.RED}{''.join(wrong_guesses)}", end="")
+    print(colorama.Style.RESET_ALL)
     return not complete
 
 
