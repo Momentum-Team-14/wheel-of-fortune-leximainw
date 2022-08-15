@@ -80,7 +80,7 @@ def evil_matches(curr_phrases, guessed, guess):
         if display not in categories:
             categories[display] = []
         categories[display].append(phrase)
-    return max(categories.items(), key=lambda x: len(x[1]) + (0 if guess in list(x[1][0]) else 1))[1]
+    return max(categories.items(), key=lambda x: len(x[1]) * (1 if guess in list(x[1][0]) else 1.13))[1]
 
 
 def format_phrase(phrase, guessed):
