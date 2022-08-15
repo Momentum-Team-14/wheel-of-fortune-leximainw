@@ -9,24 +9,45 @@ MAX_ERRORS = 8
 def play_game():
     all_phrases = import_phrases()
     while True:
+        min_len = 0
+        max_len = 999
         if DIFFICULTY_PROMPT:
             print("Do you want to play an easy, normal, or hard round?")
             while True:
                 mode = input("Difficulty: ").lower()
-                if mode == "any" or mode == "evil":
-                    f = lambda _: True
+                if mode == "any":
+                    pass
                 elif mode == "easy":
-                    f = lambda x: 4 <= len(x) <= 6
+                    min_len = 4
+                    max_len = 6
                 elif mode == "normal" or mode == "medium":
-                    f = lambda x: 6 <= len(x) <= 8
+                    min_len = 6
+                    max_len = 8
                 elif mode == "hard":
-                    f = lambda x: len(x) >= 8
+                    min_len = 8
+                elif mode == "evil":
+                    print("Do you want to play an easy, normal, hard, or brutal evil round?")
+                    while True:
+                        if mode == "any":
+                            pass
+                        elif mode == "easy":
+                            min_len = 10
+                        elif mode == "normal":
+                            min_len = 8
+                            max_len = 9
+                        elif mode == "hard":
+                            min_len = 6
+                            max_len = 7
+                            pass
+                        elif mode == "brutal":
+                            max_len = 5
+                        else:
+                            continue
+                        break
                 else:
                     continue
                 break
-        else:
-            f = lambda _: True
-        curr_phrases = [x for x in all_phrases if f(x)]
+        curr_phrases = [x for x in all_phrases if min_len <= len(x) <= max_len]
         curr_phrases = [random.choice(curr_phrases)]
         if mode == "evil":
             curr_len = len(curr_phrases[0])
