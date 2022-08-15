@@ -85,7 +85,12 @@ def play_game():
             else:
                 if mode == "evil" and len(curr_phrases) > 1:
                     curr_phrases = [x for x in curr_phrases if x.lower() != guess]
-                if guess in [x.lower() for x in curr_phrases]:
+                if guess.startswith("/"):
+                    if guess == "/howmany":
+                        print(len(curr_phrases))
+                    else
+                        print(f"unknown command {guess}")
+                elif guess in [x.lower() for x in curr_phrases]:
                     won = True
             if not display_board(curr_phrases[0], guessed_letters):
                 won = True
