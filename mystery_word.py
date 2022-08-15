@@ -43,6 +43,8 @@ def play_game():
                         print("Game over!")
                         print(f"The word was: {curr_phrases[0]}")
                         break
+            else:
+                print(f"You've already guessed {guess}!")
             if not display_board(curr_phrases[0], guessed_letters):
                 won = True
                 print("You win!")
