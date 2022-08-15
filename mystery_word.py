@@ -48,6 +48,8 @@ def play_game():
             if not display_board(curr_phrases[0], guessed_letters):
                 won = True
                 print("You win!")
+            else:
+                print(f"You have {MAX_ERRORS - errors} guesses left!")
         if not str_to_bool(input("Play again? ")):
             return
 
