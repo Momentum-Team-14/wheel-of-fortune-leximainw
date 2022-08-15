@@ -5,6 +5,7 @@ import re
 
 
 ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+DEFAULT_DEPTH = 2
 DIFFICULTY_PROMPT = True
 MAX_ERRORS = 8
 
@@ -73,7 +74,7 @@ def play_game():
                 if guess not in guessed_letters:
                     if mode == "evil":
                         evil_set = False
-                        if MAX_ERRORS - errors <= 2:
+                        if MAX_ERRORS - errors <= DEFAULT_DEPTH:
                             miss_phrases = evil_matches(curr_phrases, guessed_letters, guess, killer_mode=True)[0]
                             if len(miss_phrases):
                                 curr_phrases = miss_phrases
@@ -152,7 +153,8 @@ def display_board(phrase, guessed, guessed_phrases):
     return not complete
 
 
-def evil_matches(curr_phrases, guessed, guess=None, depth=2, killer_mode=False):
+def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
+                 killer_mode=False, alpha=float("-inf"), beta=float("inf")):
     if killer_mode:
         k_miss = 1
         k_hit = 0
@@ -166,11 +168,14 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=2, killer_mode=False):
         best = []
         best_score = float("inf")
         for guess in test_guesses:
-            results, score = evil_matches(curr_phrases, guessed, guess, depth=depth)
+            results, score = evil_matches(curr_phrases, guessed, guess, depth=depth, alpha=alpha, beta=beta)
             # min - player wants the worst score
             if score < best_score:
                 best_score = score
                 best = results
+            if score <= alpha:   # alpha cutoff
+                break
+            beta = min(beta, score)
         return (best, best_score)
     else:
         categories = {}
@@ -185,12 +190,15 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=2, killer_mode=False):
         best = []
         best_score = 0
         for _, value in categories.items():
-            results, score = evil_matches(value, guesses, depth=depth - 1)
+            results, score = evil_matches(value, guesses, depth=depth - 1, alpha=alpha, beta=beta)
             score *= k_miss if guess not in list(results[0]) else k_hit
             # max - evil match wants the best score
             if score > best_score:
                 best_score = score
                 best = results
+            if score >= beta:   # beta cutoff
+                break
+            alpha = max(alpha, score)
         return (best, best_score)
 
 
