@@ -4,6 +4,7 @@ import random
 import re
 
 
+ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 DIFFICULTY_PROMPT = True
 MAX_ERRORS = 8
 
@@ -71,7 +72,7 @@ def play_game():
             if len(guess) == 1:
                 if guess not in guessed_letters:
                     if mode == "evil":
-                        curr_phrases, _ = evil_matches(curr_phrases, guessed_letters, guess)
+                        curr_phrases = evil_matches(curr_phrases, guessed_letters, guess)[0]
                     correct = check_guess(curr_phrases[0], guess)
                     guessed_letters.append(guess)
                     if not correct:
@@ -87,7 +88,20 @@ def play_game():
                     if mode == "evil" and len(curr_phrases) > 1:
                         curr_phrases = [x for x in curr_phrases if x.lower() != guess]
                     if guess.startswith("/"):
-                        if guess == "/howmany":
+                        if guess == "/cheat":
+                            if len(curr_phrases) == 1:
+                                print(curr_phrases[0])
+                            else:
+                                best = len(curr_phrases)
+                                best_char = "?"
+                                for char in ALPHABET.lower():
+                                    subphrases = evil_matches(curr_phrases, guessed_letters, char)[0]
+                                    if len(subphrases) < best:
+                                        best = len(subphrases)
+                                        best_char = char
+                                    print(f"{char}: {len(subphrases)}")
+                                print(f"Best choice: {best_char}: {best}")
+                        elif guess == "/howmany":
                             print(len(curr_phrases))
                         else:
                             print(f"unknown command {guess}")
@@ -132,7 +146,7 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=2):
     if depth <= 0:
         return (curr_phrases, len(curr_phrases) * 1.07 if guess not in list(curr_phrases[0]) else 1)
     if guess == None:
-        test_guesses = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" if x not in guessed]
+        test_guesses = [x for x in ALPHABET if x not in guessed]
         best = []
         best_score = 0
         for guess in test_guesses:
