@@ -2,13 +2,32 @@ import random
 import re
 
 
+DIFFICULTY_PROMPT = True
 MAX_ERRORS = 8
 
 
 def play_game():
     all_phrases = import_phrases()
     while True:
-        curr_phrases = [random.choice(all_phrases)]
+        if DIFFICULTY_PROMPT:
+            print("Do you want to play an easy, normal, or hard round?")
+            while True:
+                mode = input("Difficulty: ").lower()
+                if mode == "any":
+                    f = lambda _: True
+                elif mode == "easy":
+                    f = lambda x: 4 <= len(x) <= 6
+                elif mode == "normal" or mode == "medium":
+                    f = lambda x: 6 <= len(x) <= 8
+                elif mode == "hard":
+                    f = lambda x: len(x) >= 8
+                else:
+                    continue
+                break
+        else:
+            f = lambda _: True
+        curr_phrases = [x for x in all_phrases if f(x)]
+        curr_phrases = [random.choice(curr_phrases)]
         guessed_letters = []
         errors = 0
         won = False
