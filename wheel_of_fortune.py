@@ -52,6 +52,7 @@ def play_game():
                         else:
                             continue
                         break
+                    mode = "evil"
                 else:
                     continue
                 break
