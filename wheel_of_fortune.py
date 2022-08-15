@@ -106,16 +106,29 @@ def display_board(phrase, guessed):
     return not complete
 
 
-def evil_matches(curr_phrases, guessed, guess):
-    categories = {}
-    guesses = guessed[:]
-    guesses.append(guess)
-    for phrase in curr_phrases:
-        display, _ = format_phrase(phrase, guesses)
-        if display not in categories:
-            categories[display] = []
-        categories[display].append(phrase)
-    return max(categories.items(), key=lambda x: len(x[1]) * (1 if guess in list(x[1][0]) else 1.13))[1]
+def evil_matches(curr_phrases, guessed, guess=None, depth=2):
+    if depth <= 0:
+        return curr_phrases[0]
+    if guess == None:
+        test_guesses = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" if x not in guessed]
+        best = []
+        best_len = 0
+        for guess in test_guesses:
+            results = evil_matches(curr_phrases, guessed, guess, depth=depth)
+            if len(results) > best_len:
+                best_len = len(results)
+                best = results
+        return best
+    else:
+        categories = {}
+        guesses = guessed[:]
+        guesses.append(guess)
+        for phrase in curr_phrases:
+            display, _ = format_phrase(phrase, guesses)
+            if display not in categories:
+                categories[display] = []
+            categories[display].append(phrase)
+        return max(categories.items(), key=lambda x: len(evil_matches(x[1], guesses, depth=depth - 1)))[1]
 
 
 def format_phrase(phrase, guessed):
