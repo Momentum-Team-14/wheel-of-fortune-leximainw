@@ -164,10 +164,11 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=2, killer_mode=False):
     if guess == None:
         test_guesses = [x for x in ALPHABET if x not in guessed]
         best = []
-        best_score = 0
+        best_score = float("inf")
         for guess in test_guesses:
             results, score = evil_matches(curr_phrases, guessed, guess, depth=depth)
-            if score > best_score:
+            # min - player wants the worst score
+            if score < best_score:
                 best_score = score
                 best = results
         return (best, best_score)
@@ -186,6 +187,7 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=2, killer_mode=False):
         for _, value in categories.items():
             results, score = evil_matches(value, guesses, depth=depth - 1)
             score *= k_miss if guess not in list(results[0]) else k_hit
+            # max - evil match wants the best score
             if score > best_score:
                 best_score = score
                 best = results
