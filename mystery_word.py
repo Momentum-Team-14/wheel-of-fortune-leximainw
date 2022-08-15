@@ -13,7 +13,7 @@ def play_game():
             print("Do you want to play an easy, normal, or hard round?")
             while True:
                 mode = input("Difficulty: ").lower()
-                if mode == "any":
+                if mode == "any" or mode == "evil":
                     f = lambda _: True
                 elif mode == "easy":
                     f = lambda x: 4 <= len(x) <= 6
@@ -28,6 +28,9 @@ def play_game():
             f = lambda _: True
         curr_phrases = [x for x in all_phrases if f(x)]
         curr_phrases = [random.choice(curr_phrases)]
+        if mode == "evil":
+            curr_len = len(curr_phrases[0])
+            curr_phrases = [x for x in all_phrases if len(x) == curr_len]
         guessed_letters = []
         errors = 0
         won = False
@@ -35,7 +38,9 @@ def play_game():
         while errors < MAX_ERRORS and not won:
             guess = prompt_guess()
             if guess not in guessed_letters:
-                curr_phrases, correct = check_guess(curr_phrases, guess)
+                if mode == "evil":
+                    curr_phrases = evil_matches(curr_phrases, guessed_letters, guess)
+                correct = check_guess(curr_phrases[0], guess)
                 guessed_letters.append(guess)
                 if not correct:
                     errors += 1
@@ -54,28 +59,44 @@ def play_game():
             return
 
 
-def check_guess(curr_phrases, guess):
-    return (curr_phrases, guess in list(curr_phrases[0]))
+def check_guess(phrase, guess):
+    return guess in list(phrase)
 
 
 def display_board(phrase, guessed):
-    phrase = phrase.replace('_', ' ')
     wrong_guesses = [letter for letter in guessed if letter not in list(phrase)]
-    chars = list(phrase)
+    display, complete = format_phrase(phrase, guessed)
+    print(f"{display}   Wrong: {''.join(wrong_guesses)}")
+    return not complete
+
+
+def evil_matches(curr_phrases, guessed, guess):
+    categories = {}
+    guesses = guessed[:]
+    guesses.append(guess)
+    for phrase in curr_phrases:
+        display, _ = format_phrase(phrase, guesses)
+        if display not in categories:
+            categories[display] = []
+        categories[display].append(phrase)
+    return max(categories.items(), key=lambda x: len(x[1]) + (guess in list(x[1][0]) and 0 or 1))[1]
+
+
+def format_phrase(phrase, guessed):
+    phrase = phrase.replace("_", " ")
     display = []
-    missing = False
-    for char in chars:
-        if char in guessed or re.match('[^A-Za-z]', char):
+    complete = True
+    for char in list(phrase):
+        if char in guessed or re.match("[^A-Za-z]", char):
             display.append(char)
         else:
-            missing = True
-            display.append('_')
-    print(f"{''.join(display)}   Wrong: {''.join(wrong_guesses)}")
-    return missing
+            complete = False
+            display.append("_")
+    return ("".join(display), complete)
 
 
 def prompt_guess():
-    guess = ''
+    guess = ""
     while not guess or len(guess) != 1:
         guess = input("Guess: ")
     return guess
