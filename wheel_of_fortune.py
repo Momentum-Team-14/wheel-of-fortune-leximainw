@@ -88,7 +88,7 @@ def play_game():
                 if guess.startswith("/"):
                     if guess == "/howmany":
                         print(len(curr_phrases))
-                    else
+                    else:
                         print(f"unknown command {guess}")
                 elif guess in [x.lower() for x in curr_phrases]:
                     won = True
