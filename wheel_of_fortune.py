@@ -68,25 +68,32 @@ def play_game():
         display_board(curr_phrases[0], guessed_letters)
         while errors < MAX_ERRORS and not won:
             guess = prompt_guess()
-            if guess not in guessed_letters:
-                if mode == "evil":
-                    curr_phrases = evil_matches(curr_phrases, guessed_letters, guess)
-                correct = check_guess(curr_phrases[0], guess)
-                guessed_letters.append(guess)
-                if not correct:
-                    errors += 1
-                    if errors >= MAX_ERRORS:
-                        print(colorama.Fore.RED + "Game over!" + colorama.Style.RESET_ALL)
-                        print(f"The word was: {curr_phrases[0]}")
-                        break
+            if len(guess) == 1:
+                if guess not in guessed_letters:
+                    if mode == "evil":
+                        curr_phrases = evil_matches(curr_phrases, guessed_letters, guess)
+                    correct = check_guess(curr_phrases[0], guess)
+                    guessed_letters.append(guess)
+                    if not correct:
+                        errors += 1
+                        if errors >= MAX_ERRORS:
+                            print(colorama.Fore.RED + "Game over!" + colorama.Style.RESET_ALL)
+                            print(f"The word was: {curr_phrases[0]}")
+                            break
+                else:
+                    print(f"You've already guessed {guess}!")
             else:
-                print(f"You've already guessed {guess}!")
+                if mode == "evil" and len(curr_phrases) > 1:
+                    curr_phrases = [x for x in curr_phrases if x.lower() != guess]
+                if guess in [x.lower() for x in curr_phrases]:
+                    won = True
             if not display_board(curr_phrases[0], guessed_letters):
                 won = True
-                print(colorama.Fore.GREEN + "You win!" + colorama.Style.RESET_ALL)
             else:
                 remain = MAX_ERRORS - errors
                 print(f"You have {remain} guess{'' if remain == 1 else 'es'} left!")
+        if won:
+            print(colorama.Fore.GREEN + "You win!" + colorama.Style.RESET_ALL)
         if not str_to_bool(input("Play again? ")):
             return
 
@@ -146,9 +153,9 @@ def format_phrase(phrase, guessed):
 
 def prompt_guess():
     guess = ""
-    while not guess or len(guess) != 1:
+    while not guess or (len(guess) == 1 and not re.match("[A-Za-z]", guess)):
         guess = input("Guess: ")
-    return guess
+    return guess.lower()
 
 
 def import_phrases():
