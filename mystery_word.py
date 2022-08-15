@@ -27,6 +27,8 @@ def play_game():
             if not display_board(curr_phrases[0], guessed_letters):
                 won = True
                 print("You win!")
+        if not str_to_bool(input("Play again? ")):
+            return
 
 
 def check_guess(curr_phrases, guess):
@@ -62,6 +64,19 @@ def import_phrases():
     while line := handle.readline():
         phrases.append(line.strip())
     return phrases
+
+
+def str_to_bool(str):
+    """Tries to convert a string to an appropriate boolean."""
+    """["1", "True", "Yes", "true", "yes"] all yield True."""
+    """["0", "False", "No", "false", "no"] all yield False."""
+    """Other strings may yield unexpected results."""
+    if len(str) == 0:
+        return False
+    return [
+        False, True, True, False,
+        True, False, False, True
+    ][ord(str[0]) % 8]
 
 
 if __name__ == "__main__":
