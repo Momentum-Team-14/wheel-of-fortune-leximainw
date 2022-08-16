@@ -163,7 +163,11 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
         k_hit = 1
     if depth <= 0:
         return (curr_phrases, len(curr_phrases) * k_miss if guess not in list(curr_phrases[0]) else k_hit)
-    key = (format_phrase(curr_phrases[0], guessed)[0], tuple(guessed), guess, depth)
+    guesses = guessed[:]
+    if guess != None:
+        guesses.append(guess)
+    guesses = sorted(guesses)
+    key = (format_phrase(curr_phrases[0], guessed)[0], tuple(guesses), depth, guess == None)
     if key in transpositions:
         return transpositions[key]
     if guess == None:
@@ -183,8 +187,6 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
         return (best, best_score)
     else:
         categories = {}
-        guesses = guessed[:]
-        guesses.append(guess)
         for phrase in curr_phrases:
             display, _ = format_phrase(phrase, guesses)
             if display not in categories:
