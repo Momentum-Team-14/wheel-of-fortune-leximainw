@@ -29,7 +29,7 @@ def play_game():
             curr_phrases = [x for x in all_phrases if min_len <= len(x[0]) <= max_len]
             curr_phrases = [random.choice(curr_phrases)]
             if mode == "evil":
-                curr_len = len(curr_phrases[0])
+                curr_len = len(curr_phrases[0][0])
                 curr_phrases = [x for x in all_phrases if len(x[0]) == curr_len]
         hint = ""
         if len(curr_phrases) == 1 and len(curr_phrases[0]) > 1:
