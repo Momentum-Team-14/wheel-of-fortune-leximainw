@@ -111,8 +111,10 @@ def play_game():
                                         best_char = char
                                     print(f"{char}: {len(subphrases)}")
                                 print(f"Best choice: {best_char}: {best}")
-                        elif guess == "/howmany":
+                        elif guess == "/count":
                             print(len(curr_phrases))
+                        elif guess == "/list":
+                            print(curr_phrases)
                         else:
                             print(f"unknown command {guess}")
                     elif guess in [x.lower() for x in curr_phrases]:
