@@ -31,13 +31,7 @@ def matches(format, curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
         transpositions[key] = (best, best_score)
         return (best, best_score)
     else:
-        categories = {}
-        for phrase in curr_phrases:
-            display, _ = format(phrase, guesses)
-            if display not in categories:
-                categories[display] = []
-            categories[display].append(phrase)
-
+        categories = categorize(curr_phrases)
         best = []
         best_score = 0
         for _, value in categories.items():
@@ -57,3 +51,14 @@ def matches(format, curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
             alpha = max(alpha, score)
         transpositions[key] = (best, best_score)
         return (best, best_score)
+
+
+def categorize(phrases, guesses):
+    """Categorize phrases based on what information they reveal for the current guesses."""
+    categories = {}
+    for phrase in phrases:
+        display, _ = format(phrase, guesses)
+        if display not in categories:
+            categories[display] = []
+        categories[display].append(phrase)
+    return categories
