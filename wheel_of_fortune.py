@@ -8,7 +8,7 @@ import re
 ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 DIFFICULTY_PROMPT = True
 MAX_ERRORS = 8
-WORDS_WITH_HINTS = True
+WORDS_WITH_HINTS = False
 
 
 def play_game():
@@ -34,7 +34,7 @@ def play_game():
                 curr_phrases = [x for x in all_phrases if len(x[0]) == curr_len]
         hint = ""
         if len(curr_phrases) == 1 and len(curr_phrases[0]) > 1:
-            hint = curr_phrases[0][1]
+            hint = random.choice(curr_phrases[0][1])
         curr_phrases = [x[0] for x in curr_phrases]
         guessed_letters = []
         guessed_phrases = []
@@ -149,8 +149,8 @@ def import_phrases():
     handle = open("words.txt" if not WORDS_WITH_HINTS else "words-with-hints.txt", "r")
     while line := handle.readline().strip():
         try:
-            line.index("->")
-            phrases.append(tuple([x.strip() for x in line.split("->")]))
+            index = line.index("->")
+            phrases.append((line[:index].strip(), tuple([x.strip() for x in line[index + 2:].split("|")])))
         except ValueError:
             phrases.append((line,))
     return phrases
