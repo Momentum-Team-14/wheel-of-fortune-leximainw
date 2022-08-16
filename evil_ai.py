@@ -92,13 +92,11 @@ def categorize(format, phrases, guesses):
 
 def evaluate(phrases, guess, tries):
     if tries == 0:
-        value = (phrases, 16777216)
+        return (phrases, 16777216)
     elif len(phrases) == 1:
         if guess in list(phrases[0]):
-            value = (phrases, -16777216)
+            return (phrases, -16777216)
         else:
-            value = (phrases, 1 / tries)
+            return (phrases, 1 / tries)
     else:
-        value = (phrases, len(phrases) / tries)
-    #print(value)
-    return value
+        return (phrases, len(phrases) / tries)
