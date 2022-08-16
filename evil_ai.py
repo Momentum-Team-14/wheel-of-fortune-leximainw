@@ -19,7 +19,7 @@ def matches(format, curr_phrases, guesses_left, guessed, guess=None,
     # out of depth, or node is a leaf!
     # evaluate the current node and return
     if depth <= 0 or len(curr_phrases) == 1:
-        return evaluate(curr_phrases, guesses)
+        return evaluate(curr_phrases, guesses, guesses_left)
 
     # create the key for the current game state
     key = (format(curr_phrases[0], guessed)[0], frozenset(guesses), depth, guess == None)
@@ -50,7 +50,9 @@ def matches_ai(format, curr_phrases, guesses_left, guesses, guess, depth, alpha,
         inner_guesses_left = guesses_left
         if guess not in list(value[0]):
             inner_guesses_left -= 1
-        results, score = matches(format, value, inner_guesses_left, guesses, depth=depth, alpha=alpha, beta=beta, transpositions=transpositions)
+        _, score = matches(format, value, inner_guesses_left, guesses, depth=depth, alpha=alpha, beta=beta, transpositions=transpositions)
+        # depth reward
+        score += 1
         # max - evil match wants the best score
         if not len(best) or score > best_score:
             best_score = score
@@ -88,10 +90,12 @@ def categorize(format, phrases, guesses):
     return categories
 
 
-def evaluate(phrases, guess):
+def evaluate(phrases, guess, tries):
+    if tries == 0:
+        return (phrases, 16777216)
     if len(phrases) == 1:
         if guess in list(phrases[0]):
-            return (phrases, 1)
+            return (phrases, 1 / tries)
         else:
-            return (phrases, float("-inf"))
-    return (phrases, len(phrases))
+            return (phrases, -16777216)
+    return (phrases, len(phrases) / tries)
