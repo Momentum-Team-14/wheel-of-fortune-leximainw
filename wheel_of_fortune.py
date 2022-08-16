@@ -37,11 +37,12 @@ def play_game():
         won = False
         display_board(curr_phrases[0], guessed_letters, guessed_phrases)
         while errors < MAX_ERRORS and not won:
+            remain = MAX_ERRORS - errors
             guess = prompt_guess()
             if len(guess) == 1:
                 if guess not in guessed_letters:
                     if mode == "evil":
-                        curr_phrases = evil_ai.matches(format_phrase, curr_phrases, guessed_letters, guess)[0]
+                        curr_phrases = evil_ai.matches(format_phrase, curr_phrases, remain, guessed_letters, guess)[0]
                     correct = check_guess(curr_phrases[0], guess)
                     guessed_letters.append(guess)
                     if not correct:
@@ -66,7 +67,7 @@ def play_game():
                                 for char in ALPHABET.lower():
                                     if char in guessed_letters:
                                         continue
-                                    subphrases = evil_ai.matches(format_phrase, curr_phrases, guessed_letters, char)[0]
+                                    subphrases = evil_ai.matches(format_phrase, curr_phrases, remain, guessed_letters, char)[0]
                                     if len(subphrases) < best:
                                         best = len(subphrases)
                                         best_char = char
