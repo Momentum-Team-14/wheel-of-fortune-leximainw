@@ -156,7 +156,7 @@ def display_board(phrase, guessed, guessed_phrases):
 
 
 def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
-                 killer_mode=False, alpha=float("-inf"), beta=float("inf"), transpositions={}):
+                 killer_mode=False, alpha=float("-inf"), beta=float("inf"), transpositions=None):
     if killer_mode:
         k_miss = 1
         k_hit = 0
@@ -167,6 +167,8 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
         if len(curr_phrases) == 1:
             return (curr_phrases, float("-inf"))
         return (curr_phrases, len(curr_phrases) * k_miss if guess not in list(curr_phrases[0]) else k_hit)
+    if transpositions == None:
+        transpositions = {}
     guesses = guessed[:]
     if guess != None:
         guesses.append(guess)
