@@ -164,6 +164,8 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
         k_miss = 1.07
         k_hit = 1
     if depth <= 0:
+        if len(curr_phrases) == 1:
+            return (curr_phrases, float("-inf"))
         return (curr_phrases, len(curr_phrases) * k_miss if guess not in list(curr_phrases[0]) else k_hit)
     guesses = guessed[:]
     if guess != None:
@@ -178,7 +180,7 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
         for guess in test_guesses:
             results, score = evil_matches(curr_phrases, guessed, guess, depth=depth, alpha=alpha, beta=beta)
             # min - player wants the worst score
-            if score < best_score:
+            if not len(best) or score < best_score:
                 best_score = score
                 best = results
             if score <= alpha:   # alpha cutoff
@@ -197,12 +199,16 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
         best = []
         best_score = 0
         for _, value in categories.items():
-            results, score = evil_matches(value, guesses, depth=depth - 1, alpha=alpha, beta=beta)
+            results = []
+            curr_depth = depth
+            while not len(results):
+                curr_depth -= 1
+                results, score = evil_matches(value, guesses, depth=curr_depth, alpha=alpha, beta=beta)
             score *= k_miss if guess not in list(results[0]) else k_hit
             # max - evil match wants the best score
-            if score > best_score:
+            if not len(best) or score > best_score:
                 best_score = score
-                best = results
+                best = value
             if score >= beta:   # beta cutoff
                 break
             alpha = max(alpha, score)
