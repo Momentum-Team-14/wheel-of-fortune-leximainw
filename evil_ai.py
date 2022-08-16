@@ -2,17 +2,11 @@ DEFAULT_DEPTH = 3
 
 
 def matches(format, curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
-                 killer_mode=False, alpha=float("-inf"), beta=float("inf"), transpositions=None):
-    if killer_mode:
-        k_miss = 1
-        k_hit = 0
-    else:
-        k_miss = 1.07
-        k_hit = 1
+            alpha=float("-inf"), beta=float("inf"), transpositions=None):
     if depth <= 0:
         if len(curr_phrases) == 1:
             return (curr_phrases, float("-inf"))
-        return (curr_phrases, len(curr_phrases) * k_miss if guess not in list(curr_phrases[0]) else k_hit)
+        return (curr_phrases, len(curr_phrases))
     if transpositions == None:
         transpositions = {}
     guesses = guessed[:]
@@ -52,7 +46,8 @@ def matches(format, curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
             while not len(results):
                 curr_depth -= 1
                 results, score = matches(format, value, guesses, depth=curr_depth, alpha=alpha, beta=beta, transpositions=transpositions)
-            score *= k_miss if guess not in list(results[0]) else k_hit
+            if guess not in list(results[0]):
+                score += len(value) * 1.07
             # max - evil match wants the best score
             if not len(best) or score > best_score:
                 best_score = score
