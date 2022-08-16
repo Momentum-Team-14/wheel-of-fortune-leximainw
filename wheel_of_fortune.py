@@ -14,49 +14,16 @@ def play_game():
     colorama.init()
     all_phrases = import_phrases()
     while True:
+        mode = ""
         min_len = 0
         max_len = 999
         if DIFFICULTY_PROMPT:
-            print("Do you want to play an easy, normal, or hard round?")
-            while True:
-                mode = input("Difficulty: ").lower()
-                if mode == "any":
-                    pass
-                elif mode == "custom":
-                    curr_phrases = [getpass("Phrase: ")]
-                    max_len = 0
-                elif mode == "easy":
-                    min_len = 4
-                    max_len = 6
-                elif mode == "normal" or mode == "medium":
-                    min_len = 6
-                    max_len = 8
-                elif mode == "hard":
-                    min_len = 8
-                elif mode == "evil":
-                    print("Do you want to play an easy, normal, hard, or brutal evil round?")
-                    while True:
-                        mode = input("Evilness: ").lower()
-                        if mode == "any":
-                            pass
-                        elif mode == "easy":
-                            min_len = 10
-                        elif mode == "normal":
-                            min_len = 8
-                            max_len = 9
-                        elif mode == "hard":
-                            min_len = 6
-                            max_len = 7
-                            pass
-                        elif mode == "brutal":
-                            max_len = 5
-                        else:
-                            continue
-                        break
-                    mode = "evil"
-                else:
-                    continue
-                break
+            difficulty = prompt_difficulty()
+            if type(difficulty) is list:
+                curr_phrases = difficulty
+                max_len = 0
+            else:
+                mode, min_len, max_len = difficulty
         if max_len:
             curr_phrases = [x for x in all_phrases if min_len <= len(x) <= max_len]
             curr_phrases = [random.choice(curr_phrases)]
@@ -161,19 +128,64 @@ def format_phrase(phrase, guessed):
     return ("".join(display), complete)
 
 
-def prompt_guess():
-    guess = ""
-    while not guess or (len(guess) == 1 and not re.match("[A-Za-z]", guess)):
-        guess = input("Guess: ")
-    return guess.lower()
-
-
 def import_phrases():
     phrases = []
     handle = open("words.txt", "r")
     while line := handle.readline():
         phrases.append(line.strip())
     return phrases
+
+
+def prompt_difficulty():
+    min_len = 0
+    max_len = 999
+    print("Do you want to play an easy, normal, or hard round?")
+    while True:
+        mode = input("Difficulty: ").lower()
+        if mode == "any":
+            pass
+        elif mode == "custom":
+            return [getpass("Phrase: ")]
+        elif mode == "easy":
+            min_len = 4
+            max_len = 6
+        elif mode == "normal" or mode == "medium":
+            min_len = 6
+            max_len = 8
+        elif mode == "hard":
+            min_len = 8
+        elif mode == "evil":
+            print("Do you want to play an easy, normal, hard, or brutal evil round?")
+            while True:
+                mode = input("Evilness: ").lower()
+                if mode == "any":
+                    pass
+                elif mode == "easy":
+                    min_len = 10
+                elif mode == "normal":
+                    min_len = 8
+                    max_len = 9
+                elif mode == "hard":
+                    min_len = 6
+                    max_len = 7
+                    pass
+                elif mode == "brutal":
+                    max_len = 5
+                else:
+                    continue
+                break
+            mode = "evil"
+        else:
+            continue
+        break
+    return (mode, min_len, max_len)
+
+
+def prompt_guess():
+    guess = ""
+    while not guess or (len(guess) == 1 and not re.match("[A-Za-z]", guess)):
+        guess = input("Guess: ")
+    return guess.lower()
 
 
 def str_to_bool(str):
