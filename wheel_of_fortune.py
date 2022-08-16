@@ -167,7 +167,7 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
     if key in transpositions:
         return transpositions[key]
     if guess == None:
-        test_guesses = [x for x in ALPHABET if x not in guessed]
+        test_guesses = [x for x in "etaoinshrdlcumwfgypbvkjxqz" if x not in guessed]
         best = []
         best_score = float("inf")
         for guess in test_guesses:
