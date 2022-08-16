@@ -95,7 +95,7 @@ def evaluate(phrases, guess, tries):
         return (phrases, 16777216)
     if len(phrases) == 1:
         if guess in list(phrases[0]):
-            return (phrases, 1 / tries)
-        else:
             return (phrases, -16777216)
+        else:
+            return (phrases, 1 / tries)
     return (phrases, len(phrases) / tries)
