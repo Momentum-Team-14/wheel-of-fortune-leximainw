@@ -11,6 +11,7 @@ MAX_ERRORS = 8
 
 
 def play_game():
+    """Main game loop - display the board, prompt the user, and track state."""
     colorama.init()
     all_phrases = import_phrases()
     while True:
@@ -98,10 +99,12 @@ def play_game():
 
 
 def check_guess(phrase, guess):
+    """Check if the phrase contains the guess."""
     return guess in list(phrase.lower())
 
 
 def display_board(phrase, guessed, guessed_phrases):
+    """Print the current game state."""
     wrong_guesses = [letter for letter in guessed if letter not in list(phrase.lower())]
     display, complete = format_phrase(phrase, guessed)
     print(f"{colorama.Style.BRIGHT + colorama.Fore.WHITE}{display}", end="")
@@ -116,6 +119,7 @@ def display_board(phrase, guessed, guessed_phrases):
 
 
 def format_phrase(phrase, guessed):
+    """Format the phrase based on what the user has guessed so far."""
     phrase = phrase.replace("_", " ")
     display = []
     complete = True
@@ -129,6 +133,7 @@ def format_phrase(phrase, guessed):
 
 
 def import_phrases():
+    """Read in every line as a distinct phrase."""
     phrases = []
     handle = open("words.txt", "r")
     while line := handle.readline():
@@ -137,6 +142,7 @@ def import_phrases():
 
 
 def prompt_difficulty():
+    """Prompt the user for what difficulty they would like to play at."""
     min_len = 0
     max_len = 999
     print("Do you want to play an easy, normal, or hard round?")
@@ -182,6 +188,7 @@ def prompt_difficulty():
 
 
 def prompt_guess():
+    """Prompt the user to guess a letter (or the entire phrase)."""
     guess = ""
     while not guess or (len(guess) == 1 and not re.match("[A-Za-z]", guess)):
         guess = input("Guess: ")
