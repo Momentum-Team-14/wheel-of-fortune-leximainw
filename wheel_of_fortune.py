@@ -8,6 +8,7 @@ import re
 ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 DIFFICULTY_PROMPT = True
 MAX_ERRORS = 8
+WORDS_WITH_HINTS = True
 
 
 def play_game():
@@ -33,7 +34,7 @@ def play_game():
                 curr_phrases = [x for x in all_phrases if len(x[0]) == curr_len]
         hint = ""
         if len(curr_phrases) == 1 and len(curr_phrases[0]) > 1:
-            hint = curr_phrases[0]
+            hint = curr_phrases[0][1]
         curr_phrases = [x[0] for x in curr_phrases]
         guessed_letters = []
         guessed_phrases = []
@@ -145,7 +146,7 @@ def format_phrase(phrase, guessed):
 def import_phrases():
     """Read in every line as a distinct phrase."""
     phrases = []
-    handle = open("words.txt", "r")
+    handle = open("words.txt" if not WORDS_WITH_HINTS else "words-with-hints.txt", "r")
     while line := handle.readline().strip():
         try:
             line.index("->")
