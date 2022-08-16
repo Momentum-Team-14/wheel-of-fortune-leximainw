@@ -180,7 +180,7 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
         best = []
         best_score = float("inf")
         for guess in test_guesses:
-            results, score = evil_matches(curr_phrases, guessed, guess, depth=depth, alpha=alpha, beta=beta)
+            results, score = evil_matches(curr_phrases, guessed, guess, depth=depth, alpha=alpha, beta=beta, transpositions=transpositions)
             # min - player wants the worst score
             if not len(best) or score < best_score:
                 best_score = score
@@ -205,7 +205,7 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
             curr_depth = depth
             while not len(results):
                 curr_depth -= 1
-                results, score = evil_matches(value, guesses, depth=curr_depth, alpha=alpha, beta=beta)
+                results, score = evil_matches(value, guesses, depth=curr_depth, alpha=alpha, beta=beta, transpositions=transpositions)
             score *= k_miss if guess not in list(results[0]) else k_hit
             # max - evil match wants the best score
             if not len(best) or score > best_score:
