@@ -18,7 +18,7 @@ def matches(format, curr_phrases, guesses_left, guessed, guess=None,
 
     # out of depth, or node is a leaf!
     # evaluate the current node and return
-    if depth <= 0 or len(curr_phrases) == 1:
+    if depth <= 0 or guesses_left <= 0 or len(curr_phrases) == 1:
         return evaluate(curr_phrases, guesses, guesses_left)
 
     # create the key for the current game state
@@ -92,10 +92,13 @@ def categorize(format, phrases, guesses):
 
 def evaluate(phrases, guess, tries):
     if tries == 0:
-        return (phrases, 16777216)
-    if len(phrases) == 1:
+        value = (phrases, 16777216)
+    elif len(phrases) == 1:
         if guess in list(phrases[0]):
-            return (phrases, -16777216)
+            value = (phrases, -16777216)
         else:
-            return (phrases, 1 / tries)
-    return (phrases, len(phrases) / tries)
+            value = (phrases, 1 / tries)
+    else:
+        value = (phrases, len(phrases) / tries)
+    #print(value)
+    return value
