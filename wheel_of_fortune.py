@@ -166,8 +166,7 @@ def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
     guesses = guessed[:]
     if guess != None:
         guesses.append(guess)
-    guesses = sorted(guesses)
-    key = (format_phrase(curr_phrases[0], guessed)[0], tuple(guesses), depth, guess == None)
+    key = (format_phrase(curr_phrases[0], guessed)[0], frozenset(guesses), depth, guess == None)
     if key in transpositions:
         return transpositions[key]
     if guess == None:
