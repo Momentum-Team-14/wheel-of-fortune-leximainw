@@ -1,11 +1,11 @@
 from getpass import getpass
 import colorama
+import evil_ai
 import random
 import re
 
 
 ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-DEFAULT_DEPTH = 3
 DIFFICULTY_PROMPT = True
 MAX_ERRORS = 8
 
@@ -73,14 +73,7 @@ def play_game():
             if len(guess) == 1:
                 if guess not in guessed_letters:
                     if mode == "evil":
-                        evil_set = False
-                        if MAX_ERRORS - errors <= DEFAULT_DEPTH:
-                            miss_phrases = evil_matches(curr_phrases, guessed_letters, guess, killer_mode=True)[0]
-                            if len(miss_phrases):
-                                curr_phrases = miss_phrases
-                                evil_set = True
-                        if not evil_set:
-                            curr_phrases = evil_matches(curr_phrases, guessed_letters, guess)[0]
+                        curr_phrases = evil_ai.matches(format_phrase, curr_phrases, guessed_letters, guess)[0]
                     correct = check_guess(curr_phrases[0], guess)
                     guessed_letters.append(guess)
                     if not correct:
@@ -105,7 +98,7 @@ def play_game():
                                 for char in ALPHABET.lower():
                                     if char in guessed_letters:
                                         continue
-                                    subphrases = evil_matches(curr_phrases, guessed_letters, char)[0]
+                                    subphrases = evil_ai.matches(format_phrase, curr_phrases, guessed_letters, char)[0]
                                     if len(subphrases) < best:
                                         best = len(subphrases)
                                         best_char = char
@@ -153,69 +146,6 @@ def display_board(phrase, guessed, guessed_phrases):
             print(f"\n   {guessed_phrase}", end="")
     print(colorama.Style.RESET_ALL)
     return not complete
-
-
-def evil_matches(curr_phrases, guessed, guess=None, depth=DEFAULT_DEPTH,
-                 killer_mode=False, alpha=float("-inf"), beta=float("inf"), transpositions=None):
-    if killer_mode:
-        k_miss = 1
-        k_hit = 0
-    else:
-        k_miss = 1.07
-        k_hit = 1
-    if depth <= 0:
-        if len(curr_phrases) == 1:
-            return (curr_phrases, float("-inf"))
-        return (curr_phrases, len(curr_phrases) * k_miss if guess not in list(curr_phrases[0]) else k_hit)
-    if transpositions == None:
-        transpositions = {}
-    guesses = guessed[:]
-    if guess != None:
-        guesses.append(guess)
-    key = (format_phrase(curr_phrases[0], guessed)[0], frozenset(guesses), depth, guess == None)
-    if key in transpositions:
-        return transpositions[key]
-    if guess == None:
-        test_guesses = [x for x in "etaoinshrdlcumwfgypbvkjxqz" if x not in guessed]
-        best = []
-        best_score = float("inf")
-        for guess in test_guesses:
-            results, score = evil_matches(curr_phrases, guessed, guess, depth=depth, alpha=alpha, beta=beta, transpositions=transpositions)
-            # min - player wants the worst score
-            if not len(best) or score < best_score:
-                best_score = score
-                best = results
-            if score <= alpha:   # alpha cutoff
-                break
-            beta = min(beta, score)
-        transpositions[key] = (best, best_score)
-        return (best, best_score)
-    else:
-        categories = {}
-        for phrase in curr_phrases:
-            display, _ = format_phrase(phrase, guesses)
-            if display not in categories:
-                categories[display] = []
-            categories[display].append(phrase)
-
-        best = []
-        best_score = 0
-        for _, value in categories.items():
-            results = []
-            curr_depth = depth
-            while not len(results):
-                curr_depth -= 1
-                results, score = evil_matches(value, guesses, depth=curr_depth, alpha=alpha, beta=beta, transpositions=transpositions)
-            score *= k_miss if guess not in list(results[0]) else k_hit
-            # max - evil match wants the best score
-            if not len(best) or score > best_score:
-                best_score = score
-                best = value
-            if score >= beta:   # beta cutoff
-                break
-            alpha = max(alpha, score)
-        transpositions[key] = (best, best_score)
-        return (best, best_score)
 
 
 def format_phrase(phrase, guessed):
